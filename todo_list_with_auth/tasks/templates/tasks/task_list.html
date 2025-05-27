@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}My tasks{% endblock %}
+
+{% block content %}
+
+{% load static %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'tasks/js/task_list_chart.js' %}"></script>
+
+<div class="max-w-4xl mx-auto px-4 py-8">
+
+  <h2 class="text-3xl font-bold mb-6 text-gray-900">Your tasks</h2>
+
+  <section class="mb-10">
+    <h3 class="text-xl font-semibold mb-4">Task Progress</h3>
+    <canvas id="taskChart"
+            width="300" height="300"
+            data-pending="{{ chart_data.pending }}"
+            data-in-progress="{{ chart_data.in_progress }}"
+            data-completed="{{ chart_data.completed }}"
+            class="mx-auto block max-w-full h-auto">
+    </canvas>
+  </section>
+
+  <!-- Tasks Lists -->
+  <section class="mb-8">
+    <h3 class="text-2xl font-semibold mb-4">Pending Tasks</h3>
+    <ul class="list-disc list-inside space-y-2">
+      {% for task in tasks_pending %}
+        <li class="flex items-center justify-between bg-yellow-50 p-3 rounded shadow-sm">
+          <span>{{ task.title }} <span class="text-yellow-600 font-bold">(⍺)</span></span>
+          <form method="post" action="{% url 'task-list' %}" class="flex space-x-2">
+            {% csrf_token %}
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <button type="submit" name="delete" 
+                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition">
+              Delete
+            </button>
+            <button type="submit" name="mark_ongoing"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition">
+              Ongoing
+            </button>
+          </form>
+        </li>
+      {% empty %}
+        <li class="text-gray-500 italic">No tasks</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="mb-8">
+    <h3 class="text-2xl font-semibold mb-4">In Progress Tasks</h3>
+    <ul class="list-disc list-inside space-y-2">
+      {% for task in tasks_in_progress %}
+        <li class="flex items-center justify-between bg-blue-50 p-3 rounded shadow-sm">
+          <span>{{ task.title }} <span class="text-blue-600 font-bold">(⍻)</span></span>
+          <form method="post" action="{% url 'task-list' %}" class="flex space-x-2">
+            {% csrf_token %}
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <button type="submit" name="delete"
+                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition">
+              Delete
+            </button>
+            <button type="submit" name="mark_completed"
+                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded transition">
+              Completed
+            </button>
+          </form>
+        </li>
+      {% empty %}
+        <li class="text-gray-500 italic">No in-progress tasks</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="mb-8">
+    <h3 class="text-2xl font-semibold mb-4">Completed Tasks</h3>
+    <ul class="list-disc list-inside space-y-2">
+      {% for task in tasks_completed %}
+        <li class="flex items-center justify-between bg-green-50 p-3 rounded shadow-sm">
+          <span>{{ task.title }} <span class="text-green-600 font-bold">✔</span></span>
+          <form method="post" action="{% url 'task-list' %}" class="flex space-x-2">
+            {% csrf_token %}
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <button type="submit" name="delete"
+                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition">
+              Delete
+            </button>
+          </form>
+        </li>
+      {% empty %}
+        <li class="text-gray-500 italic">No completed tasks</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <a href="{% url 'task-create' %}"
+     class="inline-block bg-indigo-600 text-white px-6 py-3 rounded shadow hover:bg-indigo-700 transition">
+    Add task
+  </a>
+
+</div>
+
+{% endblock %}
